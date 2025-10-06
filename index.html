@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>My Calendar</title>
+   
+    <link rel="icon" type="image/png" href="https://mq-edu.t1cloud.com/T1Default/CiAnywhere/Web/MQ-EDU/Workplace/v-12.0.235.0/t/MQ_STU_THEME/timages/logo-favicon.png?ts=-1811665815"> 
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="global.css?20231021">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.6.0/dist/event-calendar.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@event-calendar/build@4.6.0/dist/event-calendar.min.js"></script>
+    <style>
+        /* Top navigation styles */
+        .top-bar {
+            width: 100%;
+            background: #800000;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            height: 56px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+        }
+        .logo-and-breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+        .logo-and-breadcrumbs img {
+            height: 32px;
+        }
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            user-select: none;
+        }
+        .breadcrumbs a {
+            color: #ffd6d6;
+            text-decoration: none;
+        }
+        .search-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .search-box {
+            padding: 6px 18px;
+            border-radius: 18px;
+            border: none;
+            font-size: 15px;
+            width: 200px;
+        }
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #d1d1d1;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Sub navigation bar */
+        .sub-bar {
+            width: 100%;
+            background: #f3f3f3;
+            color: #3b3b3b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 28px;
+            border-bottom: 1px solid #e8e8e8;
+            font-size: 15px;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        .sub-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .help-button {
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 5px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #800000;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .filter-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .calendar-navigation {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .calendar-navigation button {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 4px 9px;
+            border-radius: 5px;
+            color: #800000;
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+        }
+        .today-button {
+            background: #800000;
+            color: white;
+        }
+        .sub-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .menu-dots {
+            font-size: 24px;
+            color: #666666;
+            cursor: pointer;
+        }
+        .close-x {
+            font-size: 24px;
+            color: #aaa;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Main layout adjustments */
+        main.flex-row {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 107px); /* header + subbar */
+            overflow: hidden;
+        }
+        #ec {
+            flex: 1 1 0%;
+            min-width: 0;
+            transition: flex-basis 0.3s;
+        }
+        #sidePane {
+            width: 0;
+            min-width: 0;
+            max-width: 400px;
+            background: #fff;
+            border-left: 1px solid #eee;
+            box-shadow: -2px 0 6px rgba(0,0,0,0.06);
+            overflow: auto;
+            transition: width 0.3s, min-width 0.3s;
+            position: relative;
+        }
+        #sidePane.open {
+            width: 400px;
+            min-width: 350px;
+        }
+        .side-pane-content {
+            padding: 16px 28px;
+        }
+        .close-pane {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            font-size: 28px;
+            color: #aaa;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .close-pane:hover { color: #000; }
+        body.ec-dark #sidePane { background: #222; color: #fff; }
+        body.ec-dark .side-pane-content { background: #222; color: #fff; }
+        
+        /* Event type colors */
+        .event-tutorial { background-color: #779ECB; border-color: #779ECB; }
+        .event-lecture { background-color: #FE6B64; border-color: #FE6B64; }
+        .event-online { background-color: #B29DD9; border-color: #B29DD9; }
+        
+        /* Side pane styling */
+        .event-date {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        .event-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #800000;
+            margin-bottom: 16px;
+        }
+        .event-time {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .event-week {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .location-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+        .location-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .location-address {
+            color: #666;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo-and-breadcrumbs">
+            <img src="favicon-32x32.png" alt="Logo">
+            <div class="breadcrumbs">
+                <a href="#">Home</a> &gt;
+                <a href="#">My Calendar</a> &gt;
+                <span>7 events</span>
+            </div>
+        </div>
+        <div class="search-profile">
+            <input class="search-box" type="text" placeholder="Enterprise Search">
+            <div class="profile-icon">&#9786;</div>
+        </div>
+    </div>
+    <div class="sub-bar" id="subBar">
+        <div class="sub-left">
+            <button class="help-button">
+                <span style="font-size:18px;">&#9432;</span> Help
+            </button>
+            <div class="filter-info">
+                <span style="font-size:18px;">&#128269;</span>
+                <span>7 records</span>
+            </div>
+            <div class="calendar-navigation">
+                <button id="prevBtn">&lt;</button>
+                <button id="nextBtn">&gt;</button>
+                <button class="today-button" id="todayBtn">Today</button>
+                <span id="dateRange">Mar 24 – 30, 2025</span>
+            </div>
+        </div>
+        <div class="sub-right">
+            <span class="menu-dots">&#8942;</span>
+            <span class="close-x" onclick="document.getElementById('subBar').style.display='none'">&times;</span>
+        </div>
+    </div>
+
+    <main class="flex-row">
+        <div id="ec"></div>
+        <div id="sidePane">
+            <span class="close-pane" onclick="closeSidePane()">&times;</span>
+            <div class="side-pane-content" id="sidePaneContent"></div>
+        </div>
+    </main>
+
+    <script type="text/javascript">
+        // Create the calendar
+        const ec = EventCalendar.create(document.getElementById('ec'), {
+            view: 'timeGridWeek',
+            headerToolbar: {
+                start: '', // Remove built-in buttons to use custom controls
+                center: 'title',
+                end: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek resourceTimeGridWeek,resourceTimelineWeek'
+            },
+            resources: [
+                {id: 1, title: 'Resource A'},
+                {id: 2, title: 'Resource B'}
+            ],
+            scrollTime: '09:00:00',
+            events: createEvents(),
+            views: {
+                timeGridWeek: {pointer: true},
+                resourceTimeGridWeek: {pointer: true},
+                resourceTimelineWeek: {
+                    slotDuration: '00:15',
+                    slotLabelInterval: '01:00',
+                    slotMinTime: '09:00',
+                    slotMaxTime: '21:00',
+                    slotWidth: 16,
+                    resources: [
+                        {id: 1, title: 'Resource A'},
+                        {id: 2, title: 'Resource B'},
+                        {id: 3, title: 'Resource C'},
+                        {id: 4, title: 'Resource D'},
+                        {id: 5, title: 'Resource E'},
+                        {id: 6, title: 'Resource F'},
+                        {id: 7, title: 'Resource G'},
+                        {id: 8, title: 'Resource H'},
+                        {id: 9, title: 'Resource I', children: [
+                            {id: 10, title: 'Resource J'},
+                            {id: 11, title: 'Resource K'},
+                            {id: 12, title: 'Resource L', children: [
+                                {id: 13, title: 'Resource M'},
+                                {id: 14, title: 'Resource N'},
+                                {id: 15, title: 'Resource O'}
+                            ]}
+                        ]}
+                    ]
+                }
+            },
+            dayMaxEvents: true,
+            nowIndicator: true,
+            selectable: true,
+            eventClick: function(info) {
+                showEventDetails(info.event);
+            }
+        });
+
+        function createEvents() {
+            let days = [];
+            for (let i = 0; i < 7; ++i) {
+                let day = new Date();
+                let diff = i - day.getDay();
+                day.setDate(day.getDate() + diff);
+                days[i] = day.getFullYear() + "-" + _pad(day.getMonth()+1) + "-" + _pad(day.getDate());
+            }
+            return [
+                {
+                    id: 'blockchain-monday',
+                    title: 'ACCG2065 Tutorial_1 - 8',
+                    start: days[0] + " 11:00",
+                    end: days[0] + " 13:00",
+                    resourceId: 1,
+                    extendedProps: {
+                        type: 'Tutorial',
+                        location: 'Room A123, Main Building',
+                        details: 'Detailed description for ACCG2065 Tutorial_1 - 8',
+                        week: 'Delivered in Week 5',
+                        fullLocation: '4 Western Rd 335 Tutorial Rm 04WR\nNorth Ryde'
+                    },
+                    className: 'event-tutorial'
+                },
+                {
+                    id: 'global-business',
+                    title: 'MGMT1005 Tutorial_1 - 2',
+                    start: days[0] + " 15:00",
+                    end: days[0] + " 17:00",
+                    resourceId: 2,
+                    extendedProps: {
+                        type: 'Tutorial',
+                        location: 'Room A123, Main Building',
+                        details: 'Detailed description for MGMT1005 Tutorial_1 - 2',
+                        week: 'Delivered in Week 3',
+                        fullLocation: '4 Western Rd 335 Tutorial Rm 04WR\nNorth Ryde'
+                    },
+                    className: 'event-tutorial'
+                },
+                {
+                    id: 'economics-wednesday',
+                    title: 'ECON1020 Tutorial_1 - 9',
+                    start: days[2] + " 10:30",
+                    end: days[2] + " 12:00",
+                    resourceId: 1,
+                    extendedProps: {
+                        type: 'Tutorial',
+                        location: 'Room A123, Main Building',
+                        details: 'Detailed description for ECON1020 Tutorial_1 - 9',
+                        week: 'Delivered in Week 7',
+                        fullLocation: '4 Western Rd 335 Tutorial Rm 04WR\nNorth Ryde'
+                    },
+                    className: 'event-tutorial'
+                },
+                {
+                    id: 'finance-wednesday',
+                    title: 'ACST1001 Tutorial_1 - 10',
+                    start: days[2] + " 17:30",
+                    end: days[2] + " 19:00",
+                    resourceId: 2,
+                    extendedProps: {
+                        type: 'Tutorial',
+                        location: 'Room A123, Main Building',
+                        details: 'Detailed description for ACST1001 Tutorial_1 - 10',
+                        week: 'Delivered in Week 6',
+                        fullLocation: '4 Western Rd 335 Tutorial Rm 04WR\nNorth Ryde'
+                    },
+                    className: 'event-tutorial'
+                },
+                {
+                    id: 'blockchain-thursday',
+                    title: 'ECON1020 Lecture',
+                    start: days[3] + " 11:00",
+                    end: days[3] + " 12:00",
+                    resourceId: 1,
+                    extendedProps: {
+                        type: 'Lecture',
+                        location: 'Room A123, Main Building',
+                        details: 'Detailed description for ECON1020 Lecture',
+                        week: 'Delivered in Week 4',
+                        fullLocation: '4 Western Rd 335 Tutorial Rm 04WR\nNorth Ryde'
+                    },
+                    className: 'event-lecture'
+                },
+                {
+                    id: 'economics-thursday',
+                    title: 'ACCG2065 Lecture',
+                    start: days[3] + " 11:00",
+                    end: days[3] + " 12:30",
+                    resourceId: 2,
+                    extendedProps: {
+                        type: 'Online',
+                        location: 'Room A123, Main Building',
+                        details: 'Detailed description for ACCG2065 Lecture',
+                        week: 'Delivered in Week 5',
+                        fullLocation: '4 Western Rd 335 Tutorial Rm 04WR\nNorth Ryde'
+                    },
+                    className: 'event-online'
+                },
+                {
+                    id: 'finance-friday',
+                    title: 'ACST1001 Lecture_1-1',
+                    start: days[4] + " 11:30",
+                    end: days[4] + " 13:00",
+                    resourceId: 1,
+                    extendedProps: {
+                        type: 'Lecture',
+                        location: 'Room A123, Main Building',
+                        details: 'Detailed description for ACST1001 Lecture_1-1',
+                        week: 'Delivered in Week 8',
+                        fullLocation: '4 Western Rd 335 Tutorial Rm 04WR\nNorth Ryde'
+                    },
+                    className: 'event-lecture'
+                }
+            ];
+        }
+        function _pad(num) {
+            let norm = Math.floor(Math.abs(num));
+            return (norm < 10 ? '0' : '') + norm;
+        }
+
+        // Responsive side pane logic
+        function showEventDetails(event) {
+            const sidePane = document.getElementById("sidePane");
+            const content = document.getElementById("sidePaneContent");
+            
+            const eventDate = new Date(event.start);
+            const startTime = new Date(event.start);
+            const endTime = new Date(event.end);
+            
+            // Calculate duration in hours
+            const durationMs = endTime - startTime;
+            const durationHours = (durationMs / (1000 * 60 * 60)).toFixed(1);
+            
+            // Format date: "Wednesday, 26 March 2025"
+            const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const formattedDate = eventDate.toLocaleDateString('en-AU', dateOptions);
+            
+            // Format time: "10:00am - 12:00pm"
+            const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+            const startTimeStr = startTime.toLocaleTimeString('en-AU', timeOptions);
+            const endTimeStr = endTime.toLocaleTimeString('en-AU', timeOptions);
+            
+            content.innerHTML = `
+                <div class="event-date">${formattedDate}</div>
+                <div class="event-title">${event.title || "Untitled Event"}</div>
+                <div class="event-time">${startTimeStr} - ${endTimeStr} (${durationHours} hours)</div>
+                <div class="event-week">${event.extendedProps.week || ''}</div>
+                <div class="location-section">
+                    <div class="location-title">Location</div>
+                    <div class="location-address">${event.extendedProps.fullLocation || event.extendedProps.location || 'No location specified'}</div>
+                </div>
+            `;
+            sidePane.classList.add('open');
+        }
+        
+        function closeSidePane() {
+            document.getElementById("sidePane").classList.remove('open');
+        }
+
+        // Optional: close side pane when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidePane = document.getElementById("sidePane");
+            if (sidePane.classList.contains('open') && !sidePane.contains(event.target) && !document.getElementById('ec').contains(event.target)) {
+                closeSidePane();
+            }
+        });
+
+        // Custom calendar navigation buttons
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            ec.getApi().prev();
+            updateDateRange();
+        });
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            ec.getApi().next();
+            updateDateRange();
+        });
+        document.getElementById('todayBtn').addEventListener('click', () => {
+            ec.getApi().today();
+            updateDateRange();
+        });
+
+        function updateDateRange() {
+            const view = ec.getApi().view;
+            // Format date range as "MMM dd – dd, yyyy"
+            const start = view.currentStart;
+            const end = new Date(view.currentEnd.getTime() - 1); // Subtract 1 ms for inclusive range
+            const options = { month: 'short', day: 'numeric' };
+            const startStr = start.toLocaleDateString(undefined, options);
+            const endStr = end.toLocaleDateString(undefined, options);
+            const yearStr = end.getFullYear();
+            document.getElementById('dateRange').textContent = `${startStr} – ${endStr}, ${yearStr}`;
+        }
+
+        updateDateRange();
+    </script>
+</body>
+</html>
