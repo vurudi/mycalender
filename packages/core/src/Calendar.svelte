@@ -121,7 +121,9 @@
 
     // 🆕 Added for event details side panel
  
-    let selectedEvent = null;
+    
+    // ✅ New code - using Svelte 5 runes
+    let selectedEvent = $state(null);
 
 
     function handleEventClick(event) {

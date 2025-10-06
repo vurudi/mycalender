@@ -4,8 +4,9 @@
         toISOString, toLocalDate, toViewWithLocalDates, isFunction, task, flushDebounce, hasYScroll
     } from '#lib';
 
-    const { selectedEvent } = $props();// 🆕 Added for side panel
-
+    const { selectedEvent } = $props();
+    const dispatch = $dispatch();
+    
     let {
         datesSet, eventAllUpdated, _auxiliary, _activeRange, _filteredEvents, _scrollable, _bodyEl, _tasks, _recheckScrollable,
         _queue, _view
@@ -64,7 +65,7 @@
     <div class="event-details-panel">
         <div class="event-details-header">
             <h3>{selectedEvent.title}</h3>
-            <button on:click={() => selectedEvent = null}>×</button>
+            <button on:click={() => dispatch('closeevent')}>×</button>
         </div>
         <div class="event-details-body">
             <p><strong>Start:</strong> {selectedEvent.start}</p>
