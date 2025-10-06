@@ -121,7 +121,8 @@
 
     // 🆕 Added for event details side panel
  
-    let selectedEvent = $state(null);
+    let selectedEvent = null;
+
 
     function handleEventClick(event) {
         selectedEvent = event;
